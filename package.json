@@ -1,0 +1,120 @@
+{
+  "name": "json-schema-viewer",
+  "displayName": "JSON Schema Viewer",
+  "icon": "images/viewer-icon-white.png",
+  "description": "Visualize JSON Schema files in an interactive expandable tree view",
+  "version": "1.1.0",
+  "private": true,
+  "publisher": "miman",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miman/json-schema-viewer.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "jsonSchemaViewer.preview",
+        "title": "Preview JSON Schema",
+        "icon": {
+          "light": "images/JS-V-white.png",
+          "dark": "images/JS-V-black.png"
+        }
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceFilename =~ /\\.schema\\.json$/",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceExtname == .json || resourceLangId == json",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceFilename =~ /\\.schema\\.json$/",
+          "group": "navigation"
+        }
+      ],
+      "explorer/title": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceFilename =~ /\\.schema\\.json$/",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "jsonSchemaViewer.preview",
+        "key": "shift+alt+p",
+        "when": "resourceExtname == .json || resourceLangId == json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "debug": "npm run watch",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/github": "^9.2.6",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^8.54.0",
+    "jsdom": "^27.3.0",
+    "semantic-release": "^23.0.0",
+    "typescript": "^5.3.2",
+    "vitest": "^4.0.15",
+    "vsce": "^2.15.0"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      {
+        "path": "@semantic-release/exec",
+        "prepareCmd": "npx vsce package -o json-schema-viewer-${nextRelease.version}.vsix"
+      },
+      {
+        "path": "@semantic-release/github",
+        "assets": [
+          {
+            "path": "json-schema-viewer-*.vsix",
+            "label": "VSIX Package"
+          }
+        ]
+      }
+    ]
+  }
+}
