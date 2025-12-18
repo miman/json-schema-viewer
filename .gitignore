@@ -8,3 +8,5 @@ standalone-dist/
 
 web/dist/
 *.tgz
+
+dist
