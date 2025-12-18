@@ -17,14 +17,10 @@ You can verify it's installed by running `yarn --version`.
 
 ## Automated Installation
 
-The `scripts/` folder contains a self-sustained Node application to automate the installation.
+The `backstage-installation-script/` folder contains a self-sustained Node application to automate the installation.
 
-1. Build and pack the package:
-   ```bash
-   npm run build:pack
-   ```
-2. Move the generated `.tgz` file (found in the `web/` folder) to the `backstage-installation-script/` folder of the `json-schema-viewer` repository.
-3. Run the installer from the `backstage-installation-script/` folder:
+1. Ensure you have the `backstage-installation-script` folder in your repository.
+2. Run the installer from the `backstage-installation-script/` folder:
    ```bash
    cd backstage-installation-script
    npm install
@@ -32,8 +28,7 @@ The `scripts/` folder contains a self-sustained Node application to automate the
    ```
 
 The script will:
-- Copy the `.tgz` to your Backstage root.
-- Run `yarn add` (or `npm install` as fallback) on the package in the Backstage directory.
+- Run `yarn add @miman/json-schema-viewer-react` (or `npm install` as fallback) in the Backstage directory.
 - Copy `backstage-installation-script/src/SchemaViewer.tsx` to `packages/app/src/components/catalog/SchemaViewer.tsx`.
 - **Automate code edits**: Register the custom renderer in `App.tsx` or `apis.ts` and add the Schema tab to `EntityPage.tsx`.
 
@@ -41,21 +36,7 @@ The script will:
 
 If you prefer to perform the steps manually:
 
-### 1. Building the Package
-
-1. Navigate to the root of the `json-schema-viewer` repository.
-2. Build the web component:
-   ```bash
-   npm run web:build
-   ```
-3. Navigate to the `web` directory and create the package:
-   ```bash
-   cd web
-   npm pack
-   ```
-   This will generate a file like `miman-json-schema-viewer-react-1.0.0.tgz`.
-
-### 2. Fetching the Backstage Repo
+### 1. Fetching the Backstage Repo
 
 If you don't already have a Backstage repository, you can create one using the official CLI:
 
@@ -65,16 +46,16 @@ npx @backstage/create-app@latest
 
 Follow the prompts to set up your app.
 
-### 3. Installing the Viewer into Backstage
+### 2. Installing the Viewer into Backstage
 
-1. Copy the `.tgz` file generated in step 1 to your Backstage repository root.
-2. Install it using `yarn` (recommended for Backstage) or `npm`:
+1. Navigate to your Backstage repository root.
+2. Install the package using `yarn` (recommended for Backstage) or `npm`:
    ```bash
-   yarn add ./miman-json-schema-viewer-react-1.0.0.tgz
+   yarn add @miman/json-schema-viewer-react
    # OR
-   npm install ./miman-json-schema-viewer-react-1.0.0.tgz
+   npm install @miman/json-schema-viewer-react
    ```
-3. Copy the `backstage-installation-script/src/SchemaViewer.tsx` file to `packages/app/src/components/catalog/SchemaViewer.tsx` in your Backstage app.
+3. Copy the `backstage-installation-script/src/SchemaViewer.tsx` file from this repository to `packages/app/src/components/catalog/SchemaViewer.tsx` in your Backstage app.
 
 ## 4. Configuration for `kind: API` and `jsonSchema`
 
@@ -137,28 +118,33 @@ export const apis = [
 > [!NOTE]
 > The exact registration method may vary depending on your Backstage version. Older versions might use `bind(apiDocsConfigRef).to(...)` in `apis.ts`.
 
-## 5. Adding the Schema Tab to EntityPage
+## 5. Adding a Custom Schema Tab (Optional)
 
-You can add a tab to your Entity Page to display a schema associated with an entity. For example, in `packages/app/src/components/catalog/EntityPage.tsx`:
+While the default registration above handles the **Definition** tab for APIs, you might want to add a dedicated "Schema" tab to other entity types or as a top-level tab.
+
+In `packages/app/src/components/catalog/EntityPage.tsx`:
 
 ```tsx
 import { EntitySchemaViewer } from './SchemaViewer';
 
-// ... inside your entity page definition
+// ... inside your entity page component (e.g., serviceEntityPage or apiPage)
+const mySchema = { /* Your JSON Schema object here */ };
+
 const apiPage = (
   <EntityLayout>
     <EntityLayout.Item title="Overview">
-      <Grid container spacing={3}>
-        {/* ... */}
-      </Grid>
+      {/* ... */}
     </EntityLayout.Item>
 
     <EntityLayout.Item title="Schema">
-      <EntitySchemaViewer schema={mySchemaObject} />
+      <EntitySchemaViewer schema={mySchema} />
     </EntityLayout.Item>
   </EntityLayout>
 );
 ```
+
+> [!IMPORTANT]
+> Ensure that the `schema` prop passed to `EntitySchemaViewer` is a valid JSON Schema object. If you are fetching it from the entity metadata, you might use something like `entity.metadata.annotations?.['your-schema-annotation']`.
 
 > [!TIP]
 > Since Backstage uses Material UI, you might want to wrap the `SchemaViewer` in a Backstage `Content` or `InfoCard` for better visual integration.

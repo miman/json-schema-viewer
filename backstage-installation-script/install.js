@@ -30,24 +30,7 @@ async function run() {
   try {
     console.log('--- Starting Backstage Integration for JSON Schema Viewer ---');
 
-    // 1. Find .tgz file
-    const files = fs.readdirSync(SCRIPT_DIR);
-    const tgzFile = files.find(f => f.endsWith('.tgz'));
-
-    if (!tgzFile) {
-      console.error(`Error: No .tgz package found in ${SCRIPT_DIR}.`);
-      console.error('Please build the package first and move it to the scripts folder.');
-      process.exit(1);
-    }
-
-    const tgzPath = path.join(SCRIPT_DIR, tgzFile);
-    console.log(`Found package: ${tgzFile}`);
-
-    // 2. Copy .tgz to backstage root
-    console.log(`Copying ${tgzFile} to Backstage root...`);
-    fs.copyFileSync(tgzPath, path.join(resolvedBackstageRoot, tgzFile));
-
-    // 3. Copy SchemaViewer.tsx component
+    // 1. Copy SchemaViewer.tsx component
     console.log('Copying SchemaViewer.tsx to Backstage components...');
     const componentTargetDir = path.join(resolvedBackstageRoot, 'packages/app/src/components/catalog');
     if (!fs.existsSync(componentTargetDir)) {
@@ -60,13 +43,14 @@ async function run() {
       console.warn('Warning: SchemaViewer.tsx not found in src folder. Skipping.');
     }
 
-    // 4. Run yarn add in backstage root
-    console.log(`Running 'yarn add ./${tgzFile}' in Backstage root...`);
+    // 2. Run yarn add in backstage root
+    const packageName = '@miman/json-schema-viewer-react';
+    console.log(`Running 'yarn add ${packageName}' in Backstage root...`);
     try {
-      execSync(`yarn add ./${tgzFile}`, { cwd: resolvedBackstageRoot, stdio: 'inherit' });
+      execSync(`yarn add ${packageName}`, { cwd: resolvedBackstageRoot, stdio: 'inherit' });
     } catch (installError) {
       console.warn('Warning: yarn add failed. Attempting npm install as fallback...');
-      execSync(`npm install ./${tgzFile}`, { cwd: resolvedBackstageRoot, stdio: 'inherit' });
+      execSync(`npm install ${packageName}`, { cwd: resolvedBackstageRoot, stdio: 'inherit' });
     }
 
     // 5. Automate configuration edits
@@ -75,9 +59,8 @@ async function run() {
 
     console.log('--- Installation and Configuration Complete! ---');
     console.log('\nNext Steps:');
-    console.log('1. Verify the "Schema" tab in EntityPage.tsx');
-    console.log('2. Ensure "mySchemaObject" is correctly defined/passed in EntityPage.tsx');
-    console.log('3. Restart your Backstage app.');
+    console.log('1. Verify the "Definition" tab on an API entity with spec.type: jsonSchema');
+    console.log('2. Restart your Backstage app.');
 
   } catch (error) {
     console.error('An error occurred during installation:', error);
@@ -135,28 +118,9 @@ async function automateConfig(backstageRoot) {
     return newContent;
   };
 
-  // Add Schema Tab Logic
-  const addSchemaTab = (content) => {
-    let newContent = content;
-    if (!newContent.includes("'./SchemaViewer'")) {
-      newContent = "import { EntitySchemaViewer } from './SchemaViewer';\n" + newContent;
-    }
-
-    const tabBlock = `
-    <EntityLayout.Item title="Schema">
-      <EntitySchemaViewer schema={mySchemaObject} />
-    </EntityLayout.Item>`;
-
-    if (newContent.includes('const apiPage = (') && !newContent.includes('title="Schema"')) {
-      newContent = newContent.replace('</EntityLayout>', `${tabBlock}\n    </EntityLayout>`);
-    }
-    return newContent;
-  };
-
   if (!editFile(APIS_PATH, registerRenderer)) {
     editFile(APP_PATH, registerRenderer);
   }
-  editFile(ENTITY_PAGE_PATH, addSchemaTab);
 }
 
 run();
