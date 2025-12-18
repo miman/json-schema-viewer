@@ -60,9 +60,14 @@ async function run() {
       console.warn('Warning: SchemaViewer.tsx not found in src folder. Skipping.');
     }
 
-    // 4. Run npm install in backstage root
-    console.log(`Running 'npm install ./${tgzFile}' in Backstage root...`);
-    execSync(`npm install ./${tgzFile}`, { cwd: resolvedBackstageRoot, stdio: 'inherit' });
+    // 4. Run yarn add in backstage root
+    console.log(`Running 'yarn add ./${tgzFile}' in Backstage root...`);
+    try {
+      execSync(`yarn add ./${tgzFile}`, { cwd: resolvedBackstageRoot, stdio: 'inherit' });
+    } catch (installError) {
+      console.warn('Warning: yarn add failed. Attempting npm install as fallback...');
+      execSync(`npm install ./${tgzFile}`, { cwd: resolvedBackstageRoot, stdio: 'inherit' });
+    }
 
     // 5. Automate configuration edits
     console.log('Automating Backstage configuration...');

@@ -1,6 +1,19 @@
-# Backstage Installation Guide
-
 This guide describes how to install the JSON Schema Viewer as a React component into a Backstage instance.
+
+## Prerequisites
+
+Backstage projects typically use **Yarn** for dependency management. If you don't have Yarn installed, you can enable it (on Node.js 16.10+) or install it via npm:
+
+```bash
+# Recommended for modern Node.js versions
+corepack enable
+
+# Fallback/Classic method
+npm install --global yarn
+```
+
+You can verify it's installed by running `yarn --version`.
+
 
 ## Automated Installation
 
@@ -20,7 +33,7 @@ The `scripts/` folder contains a self-sustained Node application to automate the
 
 The script will:
 - Copy the `.tgz` to your Backstage root.
-- Run `npm install` on the package in the Backstage directory.
+- Run `yarn add` (or `npm install` as fallback) on the package in the Backstage directory.
 - Copy `backstage-installation-script/src/SchemaViewer.tsx` to `packages/app/src/components/catalog/SchemaViewer.tsx`.
 - **Automate code edits**: Register the custom renderer in `App.tsx` or `apis.ts` and add the Schema tab to `EntityPage.tsx`.
 
@@ -55,8 +68,10 @@ Follow the prompts to set up your app.
 ### 3. Installing the Viewer into Backstage
 
 1. Copy the `.tgz` file generated in step 1 to your Backstage repository root.
-2. Install it using `npm`:
+2. Install it using `yarn` (recommended for Backstage) or `npm`:
    ```bash
+   yarn add ./miman-json-schema-viewer-react-1.0.0.tgz
+   # OR
    npm install ./miman-json-schema-viewer-react-1.0.0.tgz
    ```
 3. Copy the `backstage-installation-script/src/SchemaViewer.tsx` file to `packages/app/src/components/catalog/SchemaViewer.tsx` in your Backstage app.
