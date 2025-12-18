@@ -75,9 +75,19 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "standalone:dev": "vite --config standalone/vite.config.ts",
+    "standalone:build": "vite build --config standalone/vite.config.ts",
+    "standalone:preview": "vite preview --config standalone/vite.config.ts",
+    "standalone:typecheck": "tsc -p standalone/tsconfig.json",
+    "web:build": "vite build --config web/vite.config.ts && tsc -p web/tsconfig.json",
+    "web:typecheck": "tsc -p web/tsconfig.json --noEmit",
+    "build:pack": "npm run web:build && cd web && npm pack"
   },
   "devDependencies": {
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.3",
     "@semantic-release/commit-analyzer": "^11.1.0",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/github": "^9.2.6",
@@ -89,10 +99,12 @@
     "@vscode/vsce": "^3.7.1",
     "eslint": "^8.54.0",
     "jsdom": "^27.3.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "semantic-release": "^23.0.0",
     "typescript": "^5.3.2",
-    "vitest": "^4.0.15",
-    "vsce": "^2.15.0"
+    "vite": "^7.1.3",
+    "vitest": "^4.0.15"
   },
   "release": {
     "branches": [

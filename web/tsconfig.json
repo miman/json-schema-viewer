@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "emitDeclarationOnly": true,
+    "rootDir": ".",
+    "outDir": "./dist/types"
+  },
+  "include": [
+    "index.ts",
+    "viewerCore.ts",
+    "viewerDom.ts",
+    "react/**/*.ts",
+    "react/**/*.tsx",
+    "styles/**/*.ts"
+  ],
+  "exclude": ["dist", "node_modules"]
+}
