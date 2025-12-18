@@ -1,0 +1,11 @@
+{
+  "name": "json-schema-viewer-backstage-installer",
+  "version": "1.0.0",
+  "description": "Installer for JSON Schema Viewer into Backstage",
+  "main": "install.js",
+  "scripts": {
+    "install-viewer": "node install.js"
+  },
+  "author": "miman",
+  "license": "MIT"
+}
