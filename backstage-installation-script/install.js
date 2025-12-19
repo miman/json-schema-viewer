@@ -89,34 +89,116 @@ async function automateConfig(backstageRoot) {
   // Register Renderer Logic
   const registerRenderer = (content) => {
     let newContent = content;
-    if (!newContent.includes("'@backstage/plugin-api-docs'")) {
-      newContent = "import { apiDocsConfigRef } from '@backstage/plugin-api-docs';\n" + newContent;
+    
+    // 1. Add/Update Top-level Hotfix
+    const hotfixBlock = `/* JSON-SCHEMA-VIEWER-HOTFIX-START */
+if (typeof document !== 'undefined' && !document.getElementById('json-schema-viewer-styles')) {
+  const style = document.createElement('style');
+  style.id = 'json-schema-viewer-styles';
+  style.textContent = [
+    '.schema-container { ',
+      '--bg-color: #1e1e1e; --text-color: #d4d4d4; --border-color: #3c3c3c;',
+      '--header-bg: #252526; --type-string: #ce9178; --type-number: #b5cea8;',
+      '--type-boolean: #569cd6; --type-array: #dcdcaa; --type-object: #4ec9b0;',
+      '--type-null: #808080; --required-color: #d18616; --missing-color: #f14c4c;',
+      '--description-color: #6a9955; --property-name: #9cdcfe; --expand-icon: #808080;',
+      '--hover-bg: #2a2d2e;',
+      'max-width: 1200px; margin: 0 auto; padding: 16px;',
+      'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;',
+      'font-size: 13px; line-height: 1.5; color: var(--text-color);',
+      'background-color: var(--bg-color); box-sizing: border-box; text-align: left;',
+      'min-height: 500px;',
+    '}',
+    '.schema-container * { box-sizing: border-box; }',
+    '.schema-header { background: var(--header-bg); padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border-color); }',
+    '.schema-object { border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; overflow: hidden; }',
+    '.schema-object-header { display: flex; align-items: center; padding: 10px 12px; background: var(--header-bg); cursor: pointer; }',
+    '.schema-object-content { display: none; padding: 12px; border-top: 1px solid var(--border-color); }',
+    '.schema-object-content.expanded { display: block; }',
+  ].join(' ');
+  document.head.appendChild(style);
+}
+/* JSON-SCHEMA-VIEWER-HOTFIX-END */`;
+
+    if (newContent.includes('/* JSON-SCHEMA-VIEWER-HOTFIX-START */')) {
+      newContent = newContent.replace(
+        /\/\* JSON-SCHEMA-VIEWER-HOTFIX-START \*\/[\s\S]*\/\* JSON-SCHEMA-VIEWER-HOTFIX-END \*\//,
+        hotfixBlock
+      );
+    } else {
+      newContent = hotfixBlock + "\n" + newContent;
     }
+
+    // 2. Add imports
+    const hasPluginApiDocs = /['"]@backstage\/plugin-api-docs['"]/.test(newContent);
+    if (hasPluginApiDocs) {
+      if (!newContent.includes('apiDocsConfigRef')) {
+        newContent = newContent.replace(
+          /import\s+\{(.*)\}\s+from\s+['"]@backstage\/plugin-api-docs['"]/g,
+          "import {$1, apiDocsConfigRef, ApiDocsConfig, defaultRenderers} from '@backstage/plugin-api-docs'"
+        );
+      } else if (!newContent.includes('ApiDocsConfig')) {
+        newContent = newContent.replace(
+          /import\s+\{(.*)apiDocsConfigRef(.*)\}\s+from\s+['"]@backstage\/plugin-api-docs['"]/g,
+          "import {$1apiDocsConfigRef$2, ApiDocsConfig, defaultRenderers} from '@backstage/plugin-api-docs'"
+        );
+      } else if (!newContent.includes('defaultRenderers')) {
+        newContent = newContent.replace(
+          /import\s+\{(.*)ApiDocsConfig(.*)\}\s+from\s+['"]@backstage\/plugin-api-docs['"]/g,
+          "import {$1ApiDocsConfig$2, defaultRenderers} from '@backstage/plugin-api-docs'"
+        );
+      }
+    } else {
+      newContent = "import { apiDocsConfigRef, ApiDocsConfig, defaultRenderers } from '@backstage/plugin-api-docs';\n" + newContent;
+    }
+
     if (!newContent.includes("'./components/catalog/SchemaViewer'")) {
       newContent = "import { EntitySchemaViewer } from './components/catalog/SchemaViewer';\n" + newContent;
     }
 
+    if (!newContent.includes("import React")) {
+      newContent = "import React from 'react';\n" + newContent;
+    }
+
+    // 3. Add/Update Factory
     const factoryBlock = `
+  /* JSON-SCHEMA-VIEWER-START */
   createApiFactory({
     api: apiDocsConfigRef,
     deps: {},
     factory: () => {
-      const config = new ApiDocsConfig();
+      const config = new ApiDocsConfig(defaultRenderers);
       config.registerRenderer({
         type: 'jsonSchema',
         component: (definition) => (
-          <EntitySchemaViewer schema={JSON.parse(definition)} />
+          React.createElement(EntitySchemaViewer, { schema: definition })
         ),
       });
       return config;
     },
-  }),`;
+  }),
+  /* JSON-SCHEMA-VIEWER-END */`;
 
-    if ((newContent.includes('const apis = [') || newContent.includes('export const apis = [')) && !newContent.includes('type: \'jsonSchema\'')) {
-      newContent = newContent.replace(/const apis = \[|export const apis = \[/, (match) => `${match}${factoryBlock}`);
+    if (newContent.includes('/* JSON-SCHEMA-VIEWER-START */')) {
+      newContent = newContent.replace(
+        /\/\* JSON-SCHEMA-VIEWER-START \*\/[\s\S]*\/\* JSON-SCHEMA-VIEWER-END \*\//,
+        factoryBlock
+      );
+    } else {
+      const exportApisRegex = /(export\s+const\s+apis(?:\s*:\s*[^=]+)?\s*=\s*\[)/;
+      const apisRegex = /(const\s+apis(?:\s*:\s*[^=]+)?\s*=\s*\[)/;
+
+      if (exportApisRegex.test(newContent)) {
+        newContent = newContent.replace(exportApisRegex, `$1${factoryBlock}`);
+      } else if (apisRegex.test(newContent)) {
+        newContent = newContent.replace(apisRegex, `$1${factoryBlock}`);
+      }
     }
+    
     return newContent;
   };
+
+
 
   if (!editFile(APIS_PATH, registerRenderer)) {
     editFile(APP_PATH, registerRenderer);

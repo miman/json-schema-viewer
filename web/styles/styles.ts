@@ -6,7 +6,7 @@
  */
 export function getStyles(): string {
   return `
-        :root {
+        .schema-container {
             --bg-color: #1e1e1e;
             --text-color: #d4d4d4;
             --border-color: #3c3c3c;
@@ -26,7 +26,7 @@ export function getStyles(): string {
         }
 
         @media (prefers-color-scheme: light) {
-            :root {
+            .schema-container {
                 --bg-color: #ffffff;
                 --text-color: #333333;
                 --border-color: #e0e0e0;
@@ -46,24 +46,21 @@ export function getStyles(): string {
             }
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
+        .schema-container {
+            max-width: 1200px;
+            margin: 0 auto;
             font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif);
             font-size: 13px;
             line-height: 1.5;
             color: var(--text-color);
             background-color: var(--bg-color);
             padding: 16px;
+            box-sizing: border-box;
+            text-align: left;
         }
 
-        .schema-container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .schema-container * {
+            box-sizing: border-box;
         }
 
         .schema-header {

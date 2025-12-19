@@ -27,7 +27,16 @@ export function SchemaViewer(props: SchemaViewerProps) {
   useEffect(() => {
     ensureSchemaViewerStyles();
     if (!containerRef.current) return;
-    renderSchemaInto(containerRef.current, options);
+    
+    // Delay rendering by a tick to ensure the parent container (Backstage tabs/layout) 
+    // has settled its measurements before we perform manual DOM manipulation.
+    const timer = setTimeout(() => {
+      if (containerRef.current) {
+        renderSchemaInto(containerRef.current, options);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [options]);
 
   return <div ref={containerRef} className={props.className} />;
