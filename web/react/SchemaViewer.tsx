@@ -27,16 +27,16 @@ export function SchemaViewer(props: SchemaViewerProps) {
   useEffect(() => {
     ensureSchemaViewerStyles();
     if (!containerRef.current) return;
-    
-    // Delay rendering by a tick to ensure the parent container (Backstage tabs/layout) 
-    // has settled its measurements before we perform manual DOM manipulation.
-    const timer = setTimeout(() => {
-      if (containerRef.current) {
-        renderSchemaInto(containerRef.current, options);
-      }
-    }, 0);
 
-    return () => clearTimeout(timer);
+    // By the time useEffect runs, the component has been mounted and painted.
+    // At this point, it is safe to perform DOM manipulations. The parent
+    // component is already using IntersectionObserver to ensure this component
+    // is not mounted at all until it's visible.
+    renderSchemaInto(containerRef.current, options);
+
+    // The renderSchemaInto function replaces the container's innerHTML.
+    // There is no specific cleanup needed for the content it creates,
+    // as it will be removed from the DOM when this div is unmounted.
   }, [options]);
 
   return <div ref={containerRef} className={props.className} />;

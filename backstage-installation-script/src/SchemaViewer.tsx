@@ -20,34 +20,47 @@ export const EntitySchemaViewer = ({ schema }: { schema: string | any }) => {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (!parsedSchema) return;
+    const currentRef = wrapperRef.current;
+    if (!parsedSchema || !currentRef) return;
 
-    // Delay rendering to ensure the parent container (Backstage tabs/layout) 
-    // has settled its measurements before any manual DOM manipulation occurs.
-    const timer = setTimeout(() => {
-      // Defensive check: Only render if we are actually visible.
-      // material-table crashes if peers render while hidden/measuring.
-      if (wrapperRef.current && wrapperRef.current.offsetParent !== null) {
-        setIsReady(true);
-      }
-    }, 20);
+    // The IntersectionObserver is a more reliable way to detect when a component
+    // is actually visible on screen, especially in a complex layout with tabs
+    // like Backstage. It avoids the race condition of a fixed setTimeout.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When the component is intersecting (i.e., visible on screen),
+        // we can safely render the schema viewer.
+        if (entry.isIntersecting) {
+          setIsReady(true);
+          // We only need to run this once, so disconnect the observer.
+          observer.disconnect();
+        }
+      },
+      // threshold: 0.1 means the callback will trigger when at least 10%
+      // of the element is visible.
+      { threshold: 0.1 },
+    );
 
-    return () => clearTimeout(timer);
+    observer.observe(currentRef);
+
+    return () => {
+      // Clean up the observer when the component unmounts.
+      observer.disconnect();
+    };
   }, [parsedSchema]);
 
   if (!isReady) {
-    return React.createElement('div', { 
-      ref: wrapperRef, 
-      style: { minHeight: '500px', width: '100%', position: 'relative' } 
+    // This placeholder div is observed. When it becomes visible,
+    // isReady is set to true and the real component renders.
+    return React.createElement('div', {
+      ref: wrapperRef,
+      style: { minHeight: '500px', width: '100%', position: 'relative' },
     });
   }
 
   return (
-    <div ref={wrapperRef} className="json-schema-viewer-container" style={{ minHeight: '500px', width: '100%', position: 'relative' }}>
-      <SchemaViewer
-        schema={parsedSchema}
-        bundle={{}}
-      />
+    <div className="json-schema-viewer-container" style={{ minHeight: '500px', width: '100%', position: 'relative' }}>
+      <SchemaViewer schema={parsedSchema} bundle={{}} />
     </div>
   );
 };
