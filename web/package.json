@@ -1,0 +1,38 @@
+{
+  "name": "@miman/json-schema-viewer-react",
+  "version": "1.2.5",
+  "description": "React component for visualizing JSON Schema files",
+  "type": "module",
+  "scripts": {
+    "build": "vite build --config vite.config.ts && tsc -p tsconfig.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miman/json-schema-viewer.git",
+    "directory": "web"
+  },
+  "license": "MIT",
+  "keywords": [
+    "json-schema",
+    "viewer",
+    "react",
+    "backstage"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/common_defs.schema.json",
+  "title": "Gemensamma Definitioner",
+  "description": "Samling av återanvändbara definitioner (t.ex. e-post) som refereras internt och externt.",
+
+  "$defs": {
+    "EmailFormat": {
+      "description": "Definition för en giltig e-postadress.",
+      "type": "string",
+      "format": "email"
+    },
+    "EmailRequired": {
+      "description": "Kräver att e-post är tillgänglig om villkoret är uppfyllt.",
+      "type": "string"
+    },
+    "EnumType": {
+      "description": "Exempel på Enum (uppräkning)",
+      "type": "string",
+      "enum": ["PRIVAT", "ARBETE", "ANNAT"]
+    }
+  },
+
+  "properties": {
+    "typ": { "$ref": "#/$defs/EnumType" }
+  }
+}

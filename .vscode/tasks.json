@@ -1,0 +1,55 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "npm: watch",
+            "type": "npm",
+            "script": "watch",
+            "problemMatcher": "$tsc-watch",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "never"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "npm: compile",
+            "type": "npm",
+            "script": "compile",
+            "problemMatcher": "$tsc",
+            "presentation": {
+                "reveal": "never"
+            }
+        },
+        {
+            "label": "npm: watch:webview",
+            "type": "npm",
+            "script": "watch:webview",
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "owner": "esbuild-watch",
+                    "pattern": {
+                        "regexp": "^(.*)$"
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".*",
+                        "endsPattern": "Watching webview bundle\\.\\.\\."
+                    }
+                }
+            ],
+            "presentation": {
+                "reveal": "always"
+            }
+        },
+        {
+            "label": "Watch All",
+            "dependsOn": ["npm: watch", "npm: watch:webview"],
+            "problemMatcher": []
+        }
+    ]
+}

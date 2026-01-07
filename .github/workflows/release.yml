@@ -1,0 +1,47 @@
+# This is a GitHub Actions workflow for automating the release process.
+# It uses semantic-release to automatically version, create changelogs, and publish releases.
+name: Release
+
+# This workflow is triggered on every push to the main branch.
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    
+    # These permissions are required by semantic-release
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      
+    steps:
+      # The checkout action checks out the repository so the workflow can access it.
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # ⬅️ Essential change for full history analysis
+      # This action sets up a Node.js environment.
+      # The version is set to 22, and it caches npm dependencies for faster builds.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          registry-url: "https://registry.npmjs.org/"
+          scope: "@miman"
+          
+      - name: Install dependencies
+        run: npm ci
+      # This step runs semantic-release.
+      # It uses the GITHUB_TOKEN to authenticate with GitHub.
+      - name: Run Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release

@@ -1,0 +1,12 @@
+out/
+node_modules/
+*.vsix
+.vscode-test/
+
+standalone-dist/
+.vite/
+
+web/dist/
+*.tgz
+
+dist

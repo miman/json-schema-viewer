@@ -1,0 +1,467 @@
+{
+  "$id": "https://example.com/schemas/company.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Company Directory",
+  "description": "Schema for a company directory with employees, departments, and projects.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "companyName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Legal name of the company."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when this document was created."
+    },
+    "departments": {
+      "type": "array",
+      "description": "List of departments.",
+      "items": {
+        "$ref": "#/$defs/Department"
+      },
+      "minItems": 1
+    },
+    "employees": {
+      "type": "array",
+      "description": "List of employees.",
+      "items": {
+        "$ref": "#/$defs/Employee"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "description": "Projects tracked by the company.",
+      "items": {
+        "$ref": "#/$defs/Project"
+      }
+    },
+    "settings": {
+      "type": "object",
+      "description": "Global organizational settings.",
+      "additionalProperties": false,
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "pattern": "^[A-Za-z_]+(/[A-Za-z_]+)*$",
+          "description": "IANA timezone name, e.g., Europe/Stockholm."
+        },
+        "defaultCountry": {
+          "$ref": "#/$defs/CountryCode"
+        },
+        "payrollCurrency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code."
+        }
+      }
+    }
+  },
+  "required": [
+    "companyName",
+    "departments",
+    "employees",
+    "createdAt"
+  ],
+  "$defs": {
+    "UUID": {
+      "type": "string",
+      "format": "uuid",
+      "description": "RFC 4122 UUID."
+    },
+    "CountryCode": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code.",
+      "enum": [
+        "SE",
+        "NO",
+        "DK",
+        "FI",
+        "DE",
+        "GB",
+        "US"
+      ]
+    },
+    "EmploymentType": {
+      "type": "string",
+      "description": "Type of employment contract.",
+      "enum": [
+        "FullTime",
+        "PartTime",
+        "Contractor",
+        "Intern"
+      ]
+    },
+    "Role": {
+      "type": "string",
+      "description": "Simplified role enumeration.",
+      "enum": [
+        "Engineer",
+        "PrincipalEngineer",
+        "SolutionArchitect",
+        "PrincipalSolutionArchitect",
+        "Manager",
+        "Director",
+        "Sales",
+        "HR",
+        "Finance"
+      ]
+    },
+    "Email": {
+      "type": "string",
+      "format": "email"
+    },
+    "Phone": {
+      "type": "string",
+      "description": "E.164 phone number format starting with '+'.",
+      "pattern": "^\\+[1-9]\\d{6,14}$"
+    },
+    "Address": {
+      "type": "object",
+      "description": "Postal address.",
+      "additionalProperties": false,
+      "properties": {
+        "street1": {
+          "type": "string",
+          "minLength": 1
+        },
+        "street2": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "Postal/ZIP code (allows letters, numbers, hyphen, space).",
+          "pattern": "^[A-Za-z0-9\\- ]{3,12}$"
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region": {
+          "type": "string",
+          "description": "State/Province/Region."
+        },
+        "country": {
+          "$ref": "#/$defs/CountryCode"
+        }
+      },
+      "required": [
+        "street1",
+        "postalCode",
+        "city",
+        "country"
+      ]
+    },
+    "ContactInfo": {
+      "type": "object",
+      "description": "Employee contact information.",
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "$ref": "#/$defs/Email"
+        },
+        "phone": {
+          "$ref": "#/$defs/Phone"
+        },
+        "slack": {
+          "type": "string",
+          "pattern": "^@[A-Za-z0-9._-]{2,50}$",
+          "description": "Slack handle starting with '@'."
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "email"
+          ]
+        },
+        {
+          "required": [
+            "phone"
+          ]
+        }
+      ]
+    },
+    "PersonName": {
+      "type": "object",
+      "description": "Human name with optional middle and preferred names.",
+      "additionalProperties": false,
+      "properties": {
+        "first": {
+          "type": "string",
+          "minLength": 1
+        },
+        "middle": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preferred": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "first",
+        "last"
+      ]
+    },
+    "Employee": {
+      "type": "object",
+      "description": "Employee record.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/UUID"
+        },
+        "name": {
+          "$ref": "#/$defs/PersonName"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "$ref": "#/$defs/Role"
+        },
+        "employmentType": {
+          "$ref": "#/$defs/EmploymentType"
+        },
+        "managerId": {
+          "description": "Reference to another employee's id.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UUID"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "departmentId": {
+          "$ref": "#/$defs/UUID"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "endDate": {
+          "description": "For former employees or contractors.",
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contact": {
+          "$ref": "#/$defs/ContactInfo"
+        },
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "maxItems": 50
+        },
+        "meta": {
+          "type": "object",
+          "description": "Open extension bag for non-critical attributes.",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "title",
+        "role",
+        "employmentType",
+        "departmentId",
+        "startDate",
+        "contact"
+      ]
+    },
+    "Department": {
+      "type": "object",
+      "description": "Department within the company.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/UUID"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "costCenter": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}-\\d{3}$",
+          "description": "Pattern like 'IT-101'."
+        },
+        "leadId": {
+          "$ref": "#/$defs/UUID"
+        },
+        "location": {
+          "$ref": "#/$defs/Address"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "leadId"
+      ]
+    },
+    "ProjectStatus": {
+      "type": "string",
+      "enum": [
+        "Proposed",
+        "Active",
+        "Blocked",
+        "Completed",
+        "Cancelled"
+      ]
+    },
+    "Project": {
+      "type": "object",
+      "description": "Project with membership references.",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/UUID"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/ProjectStatus"
+        },
+        "sponsorDepartmentId": {
+          "$ref": "#/$defs/UUID"
+        },
+        "start": {
+          "type": "string",
+          "format": "date"
+        },
+        "end": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "members": {
+          "type": "array",
+          "description": "List of employee membership objects.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "employeeId": {
+                "$ref": "#/$defs/UUID"
+              },
+              "allocationPct": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "multipleOf": 0.5
+              },
+              "role": {
+                "type": "string",
+                "description": "Project-specific role."
+              }
+            },
+            "required": [
+              "employeeId"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "artifacts": {
+          "type": "array",
+          "description": "URLs to key project artifacts.",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "budget": {
+          "$ref": "#/$defs/Budget"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "status",
+        "sponsorDepartmentId",
+        "start"
+      ]
+    },
+    "Budget": {
+      "type": "object",
+      "description": "Monetary budget object.",
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "approved": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ]
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "name": "json-schema-viewer",
+  "displayName": "JSON Schema Viewer",
+  "icon": "images/viewer-icon-white.png",
+  "description": "Visualize JSON Schema files in an interactive expandable tree view",
+  "version": "1.3.0",
+  "private": true,
+  "publisher": "miman",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miman/json-schema-viewer.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "jsonSchemaViewer.preview",
+        "title": "Preview JSON Schema",
+        "icon": {
+          "light": "images/JS-V-white.png",
+          "dark": "images/JS-V-black.png"
+        }
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceFilename =~ /\\.schema\\.json$/",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceExtname == .json || resourceLangId == json",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceFilename =~ /\\.schema\\.json$/",
+          "group": "navigation"
+        }
+      ],
+      "explorer/title": [
+        {
+          "command": "jsonSchemaViewer.preview",
+          "when": "resourceFilename =~ /\\.schema\\.json$/",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "jsonSchemaViewer.preview",
+        "key": "shift+alt+p",
+        "when": "resourceExtname == .json || resourceLangId == json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile && npm run compile:webview",
+    "debug": "npm run watch",
+    "compile": "tsc -p ./",
+    "compile:webview": "node esbuild.webview.js",
+    "watch": "tsc -watch -p ./",
+    "watch:webview": "node esbuild.webview.js --watch",
+    "lint": "eslint src --ext ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "standalone:dev": "vite --config standalone/vite.config.ts",
+    "standalone:build": "vite build --config standalone/vite.config.ts",
+    "standalone:preview": "vite preview --config standalone/vite.config.ts",
+    "standalone:typecheck": "tsc -p standalone/tsconfig.json",
+    "web:build": "vite build --config web/vite.config.ts && tsc -p web/tsconfig.json",
+    "web:typecheck": "tsc -p web/tsconfig.json --noEmit",
+    "build:pack": "npm run web:build && cd web && npm pack"
+  },
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.6",
+    "@semantic-release/npm": "^11.0.2",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitejs/plugin-react": "^5.0.3",
+    "@vscode/vsce": "^3.7.1",
+    "esbuild": "^0.27.2",
+    "eslint": "^8.54.0",
+    "jsdom": "^27.3.0",
+    "jsonc-parser": "^3.3.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "semantic-release": "^23.0.0",
+    "typescript": "~5.7.0",
+    "vite": "^7.1.3",
+    "vitest": "^4.0.15"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ],
+      {
+        "path": "@semantic-release/exec",
+        "prepareCmd": "npx vsce package -o json-schema-viewer-${nextRelease.version}.vsix && cd web && npm version ${nextRelease.version} --no-git-tag-version && npm run build",
+        "publishCmd": "cd web && npm publish --access public"
+      },
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "json-schema-viewer-*.vsix",
+              "label": "VSIX Package"
+            }
+          ]
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json",
+            "package-lock.json",
+            "web/package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
+    ]
+  }
+}
