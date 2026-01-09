@@ -12,7 +12,9 @@ const buildOptions = {
   sourcemap: true,
   minify: false,
   loader: {
-    '.ts': 'ts'
+    '.ts': 'ts',
+    '.tsx': 'tsx',
+    '.jsx': 'jsx'
   }
 };
 
