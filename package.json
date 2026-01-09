@@ -3,7 +3,7 @@
   "displayName": "JSON Schema Viewer",
   "icon": "images/viewer-icon-white.png",
   "description": "Visualize JSON Schema files in an interactive expandable tree view",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "publisher": "miman",
   "repository": {

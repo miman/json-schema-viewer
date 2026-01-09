@@ -1,6 +1,6 @@
 {
   "name": "@miman/json-schema-viewer-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React component for visualizing JSON Schema files",
   "type": "module",
   "scripts": {
