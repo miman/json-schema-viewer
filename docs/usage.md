@@ -6,6 +6,8 @@
    - Right-click and select **Preview JSON Schema**
    - Use keyboard shortcut: `Shift+Alt+P`
    - Open Command Palette (`Ctrl+Shift+P`) and run **Preview JSON Schema**
+3. Use the **toggle** in the top right of the header to switch between the modes
+4. Use the **Active link** checkbox to enable the active link feature where the cursor in the code editor will navigate to the item you click on in the visualization views
 
 ## Example screenshot
 

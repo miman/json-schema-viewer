@@ -69,7 +69,7 @@ export function getStyles(): string {
             box-sizing: border-box;
         }
 
-        .schema-header {
+        .schema-container .schema-header {
             background: var(--header-bg);
             padding: 16px;
             border-radius: 8px;
@@ -77,20 +77,20 @@ export function getStyles(): string {
             border: 1px solid var(--border-color);
         }
 
-        .schema-header-top {
+        .schema-container .schema-header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
 
-        .schema-title {
+        .schema-container .schema-title {
             font-size: 24px;
             font-weight: 600;
             color: var(--type-object);
         }
 
-        .view-selector {
+        .schema-container .view-selector {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
@@ -99,19 +99,19 @@ export function getStyles(): string {
             color: var(--expand-icon);
         }
 
-        .view-switch {
+        .schema-container .view-switch {
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
 
-        .view-switch-label {
+        .schema-container .view-switch-label {
             font-size: 12px;
             color: var(--expand-icon);
             user-select: none;
         }
 
-        .view-switch-checkbox {
+        .schema-container .view-switch-checkbox {
             appearance: none;
             width: 33px;
             height: 18px;
@@ -125,7 +125,7 @@ export function getStyles(): string {
             transition: background 0.15s ease;
         }
 
-        .view-switch-checkbox::after {
+        .schema-container .view-switch-checkbox::after {
             content: '';
             position: absolute;
             top: 3px;
@@ -138,19 +138,19 @@ export function getStyles(): string {
             transition: transform 0.15s ease;
         }
 
-        .view-switch-checkbox:checked::after {
+        .schema-container .view-switch-checkbox:checked::after {
             transform: translateX(15px);
         }
 
-        .view-switch-left {
+        .schema-container .view-switch-left {
             margin-right: 6px;
         }
 
-        .view-switch-right {
+        .schema-container .view-switch-right {
             margin-left: 6px;
         }
 
-        .active-link-label {
+        .schema-container .active-link-label {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -162,7 +162,7 @@ export function getStyles(): string {
             white-space: nowrap;
         }
 
-        .active-link-checkbox {
+        .schema-container .active-link-checkbox {
             appearance: none;
             width: 16px;
             height: 16px;
@@ -173,12 +173,12 @@ export function getStyles(): string {
             background: var(--bg-color);
         }
 
-        .active-link-checkbox:checked {
+        .schema-container .active-link-checkbox:checked {
             background: var(--type-boolean);
             border-color: var(--type-boolean);
         }
 
-        .active-link-checkbox:checked::after {
+        .schema-container .active-link-checkbox:checked::after {
             content: '✓';
             position: absolute;
             top: 50%;
